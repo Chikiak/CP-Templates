@@ -5,6 +5,26 @@ using namespace std;
 #define pii pair<int, int>
 #define all(v) v.begin(), v.end()
 
+/*
+ * DISJOINT SET UNION (DSU / Union-Find) - Maintain disjoint sets
+ * 
+ * Constructor:
+ *   DSU(n)     - Creates n disjoint sets (0 to n-1)
+ *   DSU(r, c)  - Creates r*c sets for 2D grid
+ * 
+ * Functions:
+ *   find(a)           - Find representative of set containing a
+ *   merge(a, b)       - Union sets containing a and b, returns true if merged
+ *   sameSet(a, b)     - Returns true if a and b are in same set
+ *   getSetSize(a)     - Returns size of set containing a
+ *   
+ *   For 2D grid version:
+ *   find(r, c)        - Find representative of cell (r, c)
+ *   merge(r1,c1,r2,c2) - Union cells (r1,c1) and (r2,c2)
+ * 
+ * Time: O(α(n)) per operation (nearly constant, where α is inverse Ackermann)
+ */
+
 struct DSU {
     vi parent, sz;
     int numberOfSets;

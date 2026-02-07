@@ -3,6 +3,20 @@ using namespace std;
 
 typedef vector<int> vi;
 
+/*
+ * SEGMENT TREE - Point updates and range queries
+ * 
+ * Constructor:
+ *   SegmentTree(n) - Creates tree for n elements
+ * 
+ * Functions:
+ *   build(a)       - Initialize tree with array a (0-indexed)
+ *   update(pos, val) - Set element at position pos to val
+ *   query(l, r)    - Return sum of elements in range [l, r]
+ * 
+ * Time: O(log n) per operation
+ */
+
 struct SegmentTree {
     int n;
     vi tree;
