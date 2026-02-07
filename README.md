@@ -17,7 +17,7 @@ A comprehensive collection of algorithms and data structures for competitive pro
 
 ## About
 
-This repository contains tested and optimized implementations of common algorithms and data structures used in competitive programming. All templates are written in C++ and follow a consistent coding style.
+This repository contains implementations of common algorithms and data structures used in competitive programming. All templates are written in C++ and follow a consistent coding style.
 
 ## Templates
 
