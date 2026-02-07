@@ -93,6 +93,7 @@ vi sieve_phi(int N) {
 // Returns: vector phi where phi[i] = φ(i) for all i from 0 to N
 // Time: O(N log log N)
 // Space: O(N)
+// Note: This is provided as an alternative approach; use sieve_phi for most cases
 vi sieve_phi_spf(int N) {
     vi phi(N + 1);
     vi spf(N + 1);  // smallest prime factor

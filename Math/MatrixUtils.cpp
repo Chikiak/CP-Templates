@@ -25,11 +25,11 @@ using namespace std;
 typedef vector<int> vi;
 typedef vector<vi> vvi;
 
-// Multiply two matrices A and B
+// Multiply two matrices A and B (without modulo)
 // A: n x m matrix
 // B: m x p matrix
 // Returns: n x p matrix (A * B)
-// Note: Does NOT apply modulo during multiplication
+// Note: Use this when you don't need modulo, or use multiply_mod for modular multiplication
 vvi multiply(const vvi& A, const vvi& B) {
     int n = A.size();
     int m = B.size();
