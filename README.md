@@ -59,8 +59,12 @@ Each file contains detailed usage documentation at the top of the code. Simply o
 
 ### Math
 
-- **Criba.cpp**: Sieve of Eratosthenes
+- **SieveOfEratosthenes.cpp**: Sieve of Eratosthenes (Criba) for finding primes
 - **PascalsTriangle.cpp**: Pascal's Triangle / Binomial Coefficients
+- **MatrixUtils.cpp**: Matrix multiplication and exponentiation
+- **ModularArithmetic.cpp**: Modular operations, inverses, combinatorics, and CRT
+- **EulerTotient.cpp**: Euler's Totient (phi) function
+- **Diophantine.cpp**: Linear Diophantine Equations solver
 
 ## Template Base
 

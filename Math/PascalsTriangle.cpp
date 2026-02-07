@@ -1,19 +1,27 @@
-﻿#include <bits/stdc++.h>
+// Pascal's Triangle for computing binomial coefficients
+// Precomputes C[n][k] = nCr values up to C[34][34] using dynamic programming
+// Time: O(n^2) for precomputation, O(1) for queries
+// Use precomputePascalsTriangle() to initialize, then access C[n][k] directly
+
+#include <bits/stdc++.h>
 
 using namespace std;
 
-long long C[35][35];
+#define int long long
+#define forn(i,s,n) for(int i = (int)s; i < (int) n; i++)
 
-void precumputePascalsTriangle() {
-    for (int i = 0; i <= 31; i++) {
-        for (int j = 0; j <= 31; j++) {
+int C[35][35];
+
+void precomputePascalsTriangle() {
+    forn(i, 0, 32) {
+        forn(j, 0, 32) {
             C[i][j] = 0;
         }
     }
-
-    for (int i = 0; i < 35; i++) {
+    
+    forn(i, 0, 35) {
         C[i][0] = 1;
-        for (int j = 1; j <= i; j++) {
+        forn(j, 1, i + 1) {
             C[i][j] = C[i - 1][j - 1] + C[i - 1][j];
         }
     }
