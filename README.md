@@ -51,7 +51,7 @@ This repository contains implementations of common algorithms and data structure
 
 - **Dijkstra.cpp**: Shortest path from single source (non-negative weights)
   - `dijkstra(int n, const vvpii& adj, int src, vi& dist, vi& parent)`: Compute shortest paths
-  - `getPath(int dest, const vi& parent)`: Reconstruct shortest path to destination
+  - `getPath(int dest, const vi& parent, const vi& dist)`: Reconstruct shortest path to destination
   - Pass adjacency list by reference
 
 - **FloydWarshall.cpp**: All-pairs shortest paths
@@ -149,7 +149,7 @@ signed main() {
     
     cout << "Distance to node 3: " << dist[3] << '\n';
     
-    vi path = getPath(3, parent);
+    vi path = getPath(3, parent, dist);
     cout << "Path: ";
     for (int v : path) cout << v << " ";
     cout << '\n';

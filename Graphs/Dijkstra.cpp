@@ -34,8 +34,8 @@ void dijkstra(int n, const vvpii& adj, int src, vi& dist, vi& parent) {
     }
 }
 
-vi getPath(int dest, const vi& parent) {
-    if (parent[dest] == -1 && dest != 0) return {};
+vi getPath(int dest, const vi& parent, const vi& dist) {
+    if (dist[dest] == INF) return {};
     vi path;
     for (int v = dest; v != -1; v = parent[v]) {
         path.push_back(v);
