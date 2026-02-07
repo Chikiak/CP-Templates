@@ -3,6 +3,20 @@ using namespace std;
 
 #define int long long
 
+/*
+ * BINARY TRIE - Trie for binary representations (useful for XOR problems)
+ * 
+ * Constructor:
+ *   BinaryTrie(maxlog) - Creates trie for numbers with up to maxlog bits (default 30)
+ * 
+ * Functions:
+ *   insert(x)  - Insert number x into trie
+ *   remove(x)  - Remove number x from trie (decrements count)
+ *   maxXor(x)  - Returns maximum XOR of x with any number in trie
+ * 
+ * Time: O(log max_value) per operation
+ */
+
 struct BinaryTrie {
     struct Node {
         int child[2];

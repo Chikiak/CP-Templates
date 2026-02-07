@@ -1,6 +1,20 @@
 ﻿#include <bits/stdc++.h>
 using namespace std;
 
+/*
+ * TRIE - Prefix tree for strings
+ * 
+ * Constructor:
+ *   Trie() - Creates empty trie
+ * 
+ * Functions:
+ *   insert(s)       - Insert string s into trie
+ *   search(s)       - Returns true if exact string s exists in trie
+ *   startsWith(prefix) - Returns true if any string starts with prefix
+ * 
+ * Time: O(|s|) per operation where |s| is string length
+ */
+
 struct Trie {
     struct Node {
         map<char, int> child;

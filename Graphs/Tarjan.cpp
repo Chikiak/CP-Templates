@@ -4,6 +4,19 @@ using namespace std;
 typedef vector<int> vi;
 typedef vector<vi> vvi;
 
+/*
+ * TARJAN'S ALGORITHM - Find Strongly Connected Components (single DFS)
+ * 
+ * Arguments:
+ *   n        - Number of nodes in the graph (0-indexed)
+ *   adj      - Adjacency list of directed graph
+ *   comp     - Output: component ID for each node (will be modified)
+ * 
+ * Result: Returns number of SCCs. comp[i] contains SCC ID of node i (0 to numSCC-1)
+ * 
+ * Time: O(V + E)
+ */
+
 void tarjanDFS(int v, const vvi& adj, vi& low, vi& disc, vi& comp, 
                vector<bool>& onStack, stack<int>& st, int& timer, int& numSCC) {
     disc[v] = low[v] = timer++;

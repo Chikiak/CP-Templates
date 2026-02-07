@@ -4,6 +4,25 @@ using namespace std;
 typedef vector<int> vi;
 typedef vector<vi> vvi;
 
+/*
+ * KOSARAJU + CONDENSATION GRAPH - Find SCCs and build DAG of SCCs
+ * 
+ * Arguments:
+ *   n        - Number of nodes in the graph (0-indexed)
+ *   adj      - Adjacency list of directed graph
+ *   radj     - Reverse adjacency list
+ *   comp     - Output: component ID for each node (will be modified)
+ *   sccGraph - Output: adjacency list of condensation DAG (will be modified)
+ *   sccSize  - Output: size of each SCC (will be modified)
+ * 
+ * Result: Returns number of SCCs
+ *         comp[i] = SCC ID of node i
+ *         sccGraph[u] = list of SCC IDs that SCC u points to
+ *         sccSize[i] = number of nodes in SCC i
+ * 
+ * Time: O(V + E)
+ */
+
 void dfs1(int v, const vvi& adj, vector<bool>& visited, vi& order) {
     visited[v] = true;
     for (int u : adj[v]) {

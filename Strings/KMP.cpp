@@ -3,6 +3,23 @@ using namespace std;
 
 typedef vector<int> vi;
 
+/*
+ * KMP PATTERN MATCHING - Find all occurrences of pattern in text
+ * 
+ * computePrefixFunction:
+ *   Arguments: s - input string
+ *   Result: Returns prefix function array (pi[i] = length of longest proper 
+ *           prefix of s[0..i] that is also a suffix)
+ * 
+ * KMP:
+ *   Arguments:
+ *     text    - Text to search in
+ *     pattern - Pattern to search for
+ *   Result: Returns vector of starting positions where pattern occurs in text
+ * 
+ * Time: O(n + m) where n = text length, m = pattern length
+ */
+
 vi computePrefixFunction(const string& s) {
     int n = s.size();
     vi pi(n);

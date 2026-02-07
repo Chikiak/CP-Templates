@@ -5,6 +5,20 @@ using namespace std;
 
 typedef vector<int> vi;
 
+/*
+ * LAZY SEGMENT TREE - Range updates and range queries
+ * 
+ * Constructor:
+ *   LazySegmentTree(n) - Creates tree for n elements
+ * 
+ * Functions:
+ *   build(a)          - Initialize tree with array a (0-indexed)
+ *   update(l, r, add) - Add 'add' to all elements in range [l, r]
+ *   query(l, r)       - Return sum of elements in range [l, r]
+ * 
+ * Time: O(log n) per operation
+ */
+
 struct LazySegmentTree {
     int n;
     vi tree, lazy;
