@@ -90,7 +90,7 @@ Contributions are welcome! You can:
 
 **Language Support:**
 - Primary language: C++
-- Other languages are welcome! Feel free to add implementations in Python, Java, Rust, or any other language commonly used in competitive programming
+- Other languages are welcome! Feel free to add implementations in Python, Java, Rust, or any other language.
 
 ## License
 
