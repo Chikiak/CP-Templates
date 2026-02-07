@@ -1,6 +1,6 @@
 # CP-Templates
 
-A comprehensive collection of algorithms and data structures for competitive programming.
+A comprehensive collection of algorithms and data structures for competitive programming (primarily in C++).
 
 ## 📋 Table of Contents
 
@@ -23,7 +23,7 @@ This repository contains implementations of common algorithms and data structure
 - Where results are stored
 - Time and space complexity
 
-**Note:** Some templates may have been initially written with AI assistance, but all have been verified and tested to ensure correct functionality.
+**Note:** Some templates may have been initially written with AI assistance, but all have been reviewed and tested to ensure correct functionality.
 
 ## Templates
 
