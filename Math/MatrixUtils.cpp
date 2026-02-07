@@ -7,6 +7,24 @@ using namespace std;
 typedef vector<int> vi;
 typedef vector<vi> vvi;
 
+/*
+ * MATRIX UTILITIES - Matrix operations for competitive programming
+ * 
+ * multiply:
+ *   Arguments: A (n×m matrix), B (m×p matrix)
+ *   Result: Returns C = A×B (n×p matrix)
+ * 
+ * multiply_mod:
+ *   Arguments: A (n×m matrix), B (m×p matrix), mod (modulo value)
+ *   Result: Returns (A×B) mod 'mod'
+ * 
+ * matpow:
+ *   Arguments: A (square n×n matrix), exp (exponent), mod (modulo value)
+ *   Result: Returns A^exp mod 'mod' using binary exponentiation
+ * 
+ * Time: O(n³) for multiply, O(n³ log exp) for matpow
+ */
+
 vvi multiply(const vvi& A, const vvi& B) {
     int n = A.size();
     int m = B.size();

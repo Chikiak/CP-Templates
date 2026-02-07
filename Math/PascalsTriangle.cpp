@@ -2,6 +2,15 @@
 
 using namespace std;
 
+/*
+ * PASCAL'S TRIANGLE - Binomial coefficients
+ * 
+ * precumputePascalsTriangle:
+ *   Arguments: None (uses global C array)
+ *   Result: Fills C[n][k] with binomial coefficients C(n,k) for n,k ≤ 34
+ *   Time: O(n²)
+ */
+
 long long C[35][35];
 
 void precumputePascalsTriangle() {

@@ -6,6 +6,41 @@ using namespace std;
 
 typedef vector<int> vi;
 
+/*
+ * MODULAR ARITHMETIC - Essential modular operations
+ * 
+ * binpow:
+ *   Arguments: a (base), b (exponent), mod (modulo)
+ *   Result: Returns (a^b) % mod
+ *   Time: O(log b)
+ * 
+ * extended_gcd:
+ *   Arguments: a, b (integers), x, y (output coefficients by reference)
+ *   Result: Returns gcd(a,b), stores x,y such that ax + by = gcd(a,b)
+ *   Time: O(log min(a,b))
+ * 
+ * mod_inverse:
+ *   Arguments: a (number), mod (modulo, must be coprime with a)
+ *   Result: Returns a^(-1) mod 'mod', or -1 if inverse doesn't exist
+ *   Time: O(log mod)
+ * 
+ * precompute_factorials:
+ *   Arguments: n (max value), mod (modulo, must be prime)
+ *   Result: Fills fact[] and inv_fact[] arrays for nCr computation
+ *   Time: O(n)
+ * 
+ * nCr:
+ *   Arguments: n, r (binomial parameters), mod (modulo)
+ *   Result: Returns C(n,r) % mod (requires precompute_factorials first)
+ *   Time: O(1)
+ * 
+ * crt:
+ *   Arguments: remainders[], moduli[] (system of congruences)
+ *   Result: Returns smallest x satisfying x ≡ remainders[i] (mod moduli[i])
+ *           Returns -1 if no solution
+ *   Time: O(n²)
+ */
+
 int binpow(int a, int b, int mod) {
     int result = 1;
     a %= mod;

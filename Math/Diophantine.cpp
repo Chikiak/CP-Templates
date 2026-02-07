@@ -4,6 +4,31 @@ using namespace std;
 
 #define int long long
 
+/*
+ * LINEAR DIOPHANTINE EQUATIONS - Solve ax + by = c
+ * 
+ * extended_gcd:
+ *   Arguments: a, b (integers), x, y (output by reference)
+ *   Result: Returns gcd(a,b), stores x,y such that ax + by = gcd(a,b)
+ *   Time: O(log min(a,b))
+ * 
+ * solve_diophantine:
+ *   Arguments: a, b, c (equation coefficients), x, y (output by reference)
+ *   Result: Returns true if solution exists, stores one solution in x,y
+ *           Solves ax + by = c
+ *   Time: O(log min(a,b))
+ * 
+ * count_solutions_in_range:
+ *   Arguments: a,b,c (equation), min_x,max_x,min_y,max_y (ranges)
+ *   Result: Returns count of solutions (x,y) satisfying constraints
+ *   Time: O(log min(a,b))
+ * 
+ * find_all_solutions:
+ *   Arguments: a,b,c (equation), min_x,max_x,min_y,max_y (ranges)
+ *   Result: Returns vector of all (x,y) solutions in range
+ *   Time: O(number of solutions)
+ */
+
 int extended_gcd(int a, int b, int& x, int& y) {
     if (b == 0) {
         x = 1;

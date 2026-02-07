@@ -6,6 +6,25 @@ using namespace std;
 
 typedef vector<int> vi;
 
+/*
+ * EULER'S TOTIENT FUNCTION - Count coprimes
+ * 
+ * phi:
+ *   Arguments: n (integer)
+ *   Result: Returns φ(n) = count of integers from 1 to n coprime with n
+ *   Time: O(√n)
+ * 
+ * sieve_phi:
+ *   Arguments: N (maximum value)
+ *   Result: Returns vector where phi[i] = φ(i) for all i from 0 to N
+ *   Time: O(N log log N)
+ * 
+ * sieve_phi_spf:
+ *   Arguments: N (maximum value)
+ *   Result: Returns phi vector, also tracks smallest prime factors
+ *   Time: O(N log log N)
+ */
+
 int phi(int n) {
     int result = n;
     
