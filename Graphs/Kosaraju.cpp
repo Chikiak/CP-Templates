@@ -4,53 +4,46 @@ using namespace std;
 typedef vector<int> vi;
 typedef vector<vi> vvi;
 
-struct Kosaraju {
-    int n;
-    vvi adj, radj;
-    vi order, comp;
-    vector<bool> visited;
-    int numSCC;
-    
-    Kosaraju(int n) : n(n), adj(n), radj(n), comp(n, -1), visited(n, false), numSCC(0) {}
-    
-    void addEdge(int u, int v) {
-        adj[u].push_back(v);
-        radj[v].push_back(u);
-    }
-    
-    void dfs1(int v) {
-        visited[v] = true;
-        for (int u : adj[v]) {
-            if (!visited[u]) {
-                dfs1(u);
-            }
+void dfs1(int v, const vvi& adj, vector<bool>& visited, vi& order) {
+    visited[v] = true;
+    for (int u : adj[v]) {
+        if (!visited[u]) {
+            dfs1(u, adj, visited, order);
         }
-        order.push_back(v);
     }
+    order.push_back(v);
+}
+
+void dfs2(int v, const vvi& radj, vi& comp, int c) {
+    comp[v] = c;
+    for (int u : radj[v]) {
+        if (comp[u] == -1) {
+            dfs2(u, radj, comp, c);
+        }
+    }
+}
+
+int kosaraju(int n, const vvi& adj, const vvi& radj, vi& comp) {
+    vector<bool> visited(n, false);
+    vi order;
     
-    void dfs2(int v, int c) {
-        comp[v] = c;
-        for (int u : radj[v]) {
-            if (comp[u] == -1) {
-                dfs2(u, c);
-            }
+    for (int i = 0; i < n; i++) {
+        if (!visited[i]) {
+            dfs1(i, adj, visited, order);
         }
     }
     
-    void findSCC() {
-        for (int i = 0; i < n; i++) {
-            if (!visited[i]) {
-                dfs1(i);
-            }
-        }
-        
-        reverse(order.begin(), order.end());
-        
-        for (int v : order) {
-            if (comp[v] == -1) {
-                dfs2(v, numSCC);
-                numSCC++;
-            }
+    reverse(order.begin(), order.end());
+    
+    comp.assign(n, -1);
+    int numSCC = 0;
+    
+    for (int v : order) {
+        if (comp[v] == -1) {
+            dfs2(v, radj, comp, numSCC);
+            numSCC++;
         }
     }
-};
+    
+    return numSCC;
+}

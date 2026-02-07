@@ -50,29 +50,27 @@ This repository contains implementations of common algorithms and data structure
 ### Graphs
 
 - **Dijkstra.cpp**: Shortest path from single source (non-negative weights)
-  - `addEdge(int u, int v, int w)`: Add directed edge
-  - `solve(int src)`: Compute shortest paths from source
-  - `getPath(int dest)`: Reconstruct shortest path to destination
+  - `dijkstra(int n, const vvpii& adj, int src, vi& dist, vi& parent)`: Compute shortest paths
+  - `getPath(int dest, const vi& parent)`: Reconstruct shortest path to destination
+  - Pass adjacency list by reference
 
 - **FloydWarshall.cpp**: All-pairs shortest paths
-  - `addEdge(int u, int v, int w)`: Add edge
-  - `solve()`: Compute all-pairs shortest paths
-  - `hasNegativeCycle()`: Detect negative cycles
+  - `floydWarshall(int n, vvi& dist)`: Compute all-pairs shortest paths (modifies dist in-place)
+  - `hasNegativeCycle(int n, const vvi& dist)`: Detect negative cycles
   - Time complexity: O(n³)
 
 - **Kosaraju.cpp**: Find Strongly Connected Components
-  - `addEdge(int u, int v)`: Add directed edge
-  - `findSCC()`: Find all SCCs
-  - Returns component ID for each node
+  - `kosaraju(int n, const vvi& adj, const vvi& radj, vi& comp)`: Find all SCCs
+  - Returns number of SCCs, fills comp array with component IDs
+  - Requires both adjacency list and reverse adjacency list
 
 - **Tarjan.cpp**: Alternative SCC algorithm (single DFS)
-  - `addEdge(int u, int v)`: Add directed edge
-  - `findSCC()`: Find all SCCs using Tarjan's algorithm
+  - `tarjan(int n, const vvi& adj, vi& comp)`: Find all SCCs using Tarjan's algorithm
+  - Returns number of SCCs, fills comp array with component IDs
 
 - **KosarajuCondensation.cpp**: SCC + Condensation Graph
-  - `addEdge(int u, int v)`: Add directed edge
-  - `findSCC()`: Find all SCCs
-  - `buildCondensation()`: Build DAG of SCCs
+  - `kosarajuCondensation(int n, const vvi& adj, const vvi& radj, vi& comp, vvi& sccGraph, vi& sccSize)`: Find SCCs and build condensation
+  - Returns number of SCCs and builds the DAG of SCCs
   - Useful for DP on DAGs after finding SCCs
 
 ### Strings
@@ -128,21 +126,33 @@ signed main() {
 using namespace std;
 #define int long long
 
+typedef vector<int> vi;
+typedef pair<int, int> pii;
+typedef vector<pii> vpii;
+typedef vector<vpii> vvpii;
+
 // [Copy Dijkstra.cpp code here]
 
 signed main() {
     int n = 5; // number of nodes
-    Dijkstra graph(n);
+    vvpii adj(n);
     
-    graph.addEdge(0, 1, 4);
-    graph.addEdge(0, 2, 1);
-    graph.addEdge(2, 1, 2);
-    graph.addEdge(1, 3, 1);
-    graph.addEdge(2, 3, 5);
+    // Add edges: adj[u].push_back({v, w})
+    adj[0].push_back({1, 4});
+    adj[0].push_back({2, 1});
+    adj[2].push_back({1, 2});
+    adj[1].push_back({3, 1});
+    adj[2].push_back({3, 5});
     
-    graph.solve(0); // compute from node 0
+    vi dist, parent;
+    dijkstra(n, adj, 0, dist, parent);
     
-    cout << "Distance to node 3: " << graph.dist[3] << '\n';
+    cout << "Distance to node 3: " << dist[3] << '\n';
+    
+    vi path = getPath(3, parent);
+    cout << "Path: ";
+    for (int v : path) cout << v << " ";
+    cout << '\n';
     
     return 0;
 }
@@ -154,19 +164,60 @@ signed main() {
 #include <bits/stdc++.h>
 using namespace std;
 
+typedef vector<int> vi;
+
 // [Copy KMP.cpp code here]
 
 int main() {
     string text = "ababcababa";
     string pattern = "aba";
     
-    vector<int> matches = KMP(text, pattern);
+    vi matches = KMP(text, pattern);
     
     cout << "Pattern found at positions: ";
     for (int pos : matches) {
         cout << pos << " ";
     }
     cout << '\n';
+    
+    return 0;
+}
+```
+
+### Example: Using Kosaraju for SCC
+
+```cpp
+#include <bits/stdc++.h>
+using namespace std;
+
+typedef vector<int> vi;
+typedef vector<vi> vvi;
+
+// [Copy Kosaraju.cpp code here]
+
+int main() {
+    int n = 5;
+    vvi adj(n), radj(n);
+    
+    // Add edges
+    auto addEdge = [&](int u, int v) {
+        adj[u].push_back(v);
+        radj[v].push_back(u);
+    };
+    
+    addEdge(0, 1);
+    addEdge(1, 2);
+    addEdge(2, 0);
+    addEdge(1, 3);
+    addEdge(3, 4);
+    
+    vi comp;
+    int numSCC = kosaraju(n, adj, radj, comp);
+    
+    cout << "Number of SCCs: " << numSCC << '\n';
+    for (int i = 0; i < n; i++) {
+        cout << "Node " << i << " is in SCC " << comp[i] << '\n';
+    }
     
     return 0;
 }

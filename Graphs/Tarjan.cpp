@@ -4,52 +4,46 @@ using namespace std;
 typedef vector<int> vi;
 typedef vector<vi> vvi;
 
-struct Tarjan {
-    int n;
-    vvi adj;
-    vi low, disc, comp;
-    vector<bool> onStack;
+void tarjanDFS(int v, const vvi& adj, vi& low, vi& disc, vi& comp, 
+               vector<bool>& onStack, stack<int>& st, int& timer, int& numSCC) {
+    disc[v] = low[v] = timer++;
+    st.push(v);
+    onStack[v] = true;
+    
+    for (int u : adj[v]) {
+        if (disc[u] == -1) {
+            tarjanDFS(u, adj, low, disc, comp, onStack, st, timer, numSCC);
+            low[v] = min(low[v], low[u]);
+        } else if (onStack[u]) {
+            low[v] = min(low[v], disc[u]);
+        }
+    }
+    
+    if (low[v] == disc[v]) {
+        while (true) {
+            int u = st.top();
+            st.pop();
+            onStack[u] = false;
+            comp[u] = numSCC;
+            if (u == v) break;
+        }
+        numSCC++;
+    }
+}
+
+int tarjan(int n, const vvi& adj, vi& comp) {
+    vi low(n), disc(n, -1);
+    vector<bool> onStack(n, false);
     stack<int> st;
-    int timer, numSCC;
+    int timer = 0, numSCC = 0;
     
-    Tarjan(int n) : n(n), adj(n), low(n), disc(n, -1), comp(n, -1), 
-                     onStack(n, false), timer(0), numSCC(0) {}
+    comp.assign(n, -1);
     
-    void addEdge(int u, int v) {
-        adj[u].push_back(v);
-    }
-    
-    void dfs(int v) {
-        disc[v] = low[v] = timer++;
-        st.push(v);
-        onStack[v] = true;
-        
-        for (int u : adj[v]) {
-            if (disc[u] == -1) {
-                dfs(u);
-                low[v] = min(low[v], low[u]);
-            } else if (onStack[u]) {
-                low[v] = min(low[v], disc[u]);
-            }
-        }
-        
-        if (low[v] == disc[v]) {
-            while (true) {
-                int u = st.top();
-                st.pop();
-                onStack[u] = false;
-                comp[u] = numSCC;
-                if (u == v) break;
-            }
-            numSCC++;
+    for (int i = 0; i < n; i++) {
+        if (disc[i] == -1) {
+            tarjanDFS(i, adj, low, disc, comp, onStack, st, timer, numSCC);
         }
     }
     
-    void findSCC() {
-        for (int i = 0; i < n; i++) {
-            if (disc[i] == -1) {
-                dfs(i);
-            }
-        }
-    }
-};
+    return numSCC;
+}
