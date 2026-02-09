@@ -8,80 +8,86 @@
 using namespace std;
 
 #define int long long
-typedef vector<int> vi;
 
-int gcd(int a, int b) { return b ? gcd(b, a % b) : a; }
+int extended_gcd(int a, int b, int &x, int &y) {
+    if (a == 0) {
+        x = 0; y = 1;
+        return b;
+    }
+    int x1, y1;
+    int d = extended_gcd(b % a, a, x1, y1);
+    x = y1 - (b / a) * x1;
+    y = x1;
+    return d;
+}
 
 bool find_any_solution(int a, int b, int c, int &x0, int &y0, int &g) {
-    if (a == 0 && b == 0) {
-        if (c == 0) {
-            x0 = 0;
-            y0 = 0;
-            g = 0;
-            return true;
-        }
-        return false;
-    }
-    if (a == 0) {
-        if (c % b == 0) {
-            x0 = 0;
-            y0 = c / b;
-            g = abs(b);
-            return true;
-        }
-        return false;
-    }
-    if (b == 0) {
-        if (c % a == 0) {
-            x0 = c / a;
-            y0 = 0;
-            g = abs(a);
-            return true;
-        }
-        return false;
-    }
-    g = gcd(abs(a), abs(b));
-    if (c % g != 0) return false;
-    int x, y;
-    function<int(int, int, int&, int&)> extended_gcd = [&](int a, int b, int &x, int &y) -> int {
-        if (b == 0) {
-            x = 1;
-            y = 0;
-            return a;
-        }
-        int x1, y1;
-        int d = extended_gcd(b, a % b, x1, y1);
-        x = y1;
-        y = x1 - (a / b) * y1;
-        return d;
-    };
-    extended_gcd(abs(a), abs(b), x, y);
-    x *= c / g;
-    y *= c / g;
-    if (a < 0) x = -x;
-    if (b < 0) y = -y;
-    x0 = x;
-    y0 = y;
+    g = extended_gcd(abs(a), abs(b), x0, y0);
+    if (c % g) return false;
+
+    x0 *= c / g;
+    y0 *= c / g;
+    if (a < 0) x0 = -x0;
+    if (b < 0) y0 = -y0;
     return true;
 }
 
+void shift_solution(int &x, int &y, int a, int b, int cnt) {
+    x += cnt * b;
+    y -= cnt * a;
+}
+
 int count_solutions(int a, int b, int c, int minx, int maxx, int miny, int maxy) {
-    int x0, y0, g;
-    if (!find_any_solution(a, b, c, x0, y0, g)) return 0;
+    int x, y, g;
+    if (!find_any_solution(a, b, c, x, y, g)) return 0;
+
+    if (a == 0 && b == 0) {
+        if (c == 0) return (maxx - minx + 1) * (maxy - miny + 1);
+        return 0;
+    }
+    if (a == 0) {
+        if (c % b == 0) {
+            int y_val = c / b;
+            if (y_val >= miny && y_val <= maxy) return maxx - minx + 1;
+        }
+        return 0;
+    }
+    if (b == 0) {
+        if (c % a == 0) {
+            int x_val = c / a;
+            if (x_val >= minx && x_val <= maxx) return maxy - miny + 1;
+        }
+        return 0;
+    }
+
     a /= g;
     b /= g;
-    int sign_a = a > 0 ? 1 : -1;
-    int sign_b = b > 0 ? 1 : -1;
-    int lx1 = (minx - x0) * sign_a;
-    int rx1 = (maxx - x0) * sign_a;
-    int lx2 = (-(maxy - y0)) * sign_b;
-    int rx2 = (-(miny - y0)) * sign_b;
+
+    int sign_a = a > 0 ? +1 : -1;
+    int sign_b = b > 0 ? +1 : -1;
+
+    shift_solution(x, y, a, b, (minx - x) / b);
+    if (x < minx) shift_solution(x, y, a, b, sign_b);
+    if (x > maxx) return 0;
+    int lx1 = x;
+
+    shift_solution(x, y, a, b, (maxx - x) / b);
+    if (x > maxx) shift_solution(x, y, a, b, -sign_b);
+    int rx1 = x;
+    
+    shift_solution(x, y, a, b, -(miny - y) / a);
+    if (y < miny) shift_solution(x, y, a, b, -sign_a);
+    if (y > maxy) return 0;
+    int lx2 = x;
+
+    shift_solution(x, y, a, b, -(maxy - y) / a);
+    if (y > maxy) shift_solution(x, y, a, b, sign_a);
+    int rx2 = x;
+
+    if (lx2 > rx2) swap(lx2, rx2);
     int lx = max(lx1, lx2);
     int rx = min(rx1, rx2);
+
     if (lx > rx) return 0;
-    int k_min = lx / abs(b);
-    if (lx % abs(b) != 0 && lx > 0) k_min++;
-    int k_max = rx / abs(b);
-    if (rx % abs(b) != 0 && rx < 0) k_max--;
-    return k_max - k_min + 1;
+    return (rx - lx) / abs(b) + 1;
 }
