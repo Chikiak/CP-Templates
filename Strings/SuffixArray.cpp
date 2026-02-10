@@ -161,12 +161,9 @@ struct SuffixArray {
     int getLCP(int i, int j) {
         if (i == j) return n - i;
         
-        // Get ranks of suffixes
-        int ri = -1, rj = -1;
-        for (int k = 0; k < n; k++) {
-            if (sa[k] == i) ri = k;
-            if (sa[k] == j) rj = k;
-        }
+        // Get ranks of suffixes using the inverse array
+        int ri = pos[i];
+        int rj = pos[j];
         
         if (ri > rj) swap(ri, rj);
         
@@ -191,12 +188,9 @@ struct SuffixArray {
         }
         
         // They differ at position commonLen
-        // Compare using suffix array ranks
-        int ri1 = -1, ri2 = -1;
-        for (int k = 0; k < n; k++) {
-            if (sa[k] == i1) ri1 = k;
-            if (sa[k] == i2) ri2 = k;
-        }
+        // Compare using suffix array ranks from the inverse array
+        int ri1 = pos[i1];
+        int ri2 = pos[i2];
         
         return (ri1 < ri2) ? -1 : 1;
     }
