@@ -6,6 +6,7 @@ A comprehensive collection of algorithms and data structures for competitive pro
 
 - [About](#about)
 - [Templates](#templates)
+  - [Data Structures](#data-structures)
   - [DSU (Disjoint Set Union)](#dsu-disjoint-set-union)
   - [Segment Trees](#segment-trees)
   - [Graphs](#graphs)
@@ -29,6 +30,10 @@ This repository contains implementations of common algorithms and data structure
 
 Each file contains detailed usage documentation at the top of the code. Simply open the file to see how to use it.
 
+### Data Structures
+
+- **SparseTable.cpp**: Generic Sparse Table for O(1) range queries (RMQ, GCD, etc.)
+
 ### DSU (Disjoint Set Union)
 
 - **BaseDSU.cpp**: Standard Disjoint Set Union with path compression and union by size
@@ -51,6 +56,7 @@ Each file contains detailed usage documentation at the top of the code. Simply o
 ### Strings
 
 - **KMP.cpp**: Knuth-Morris-Pratt pattern matching
+- **SuffixArray.cpp**: Suffix Array with LCP array, pattern search, and substring queries
 
 ### Trie
 
