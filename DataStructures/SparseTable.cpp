@@ -4,7 +4,7 @@ using namespace std;
 /*
  * SPARSE TABLE - Range query data structure with O(1) query time
  * 
- * Constructor:
+ * Initialization:
  *   SparseTable<T, F>(a, func) - Creates sparse table from array a with binary function func
  *   
  * Arguments:
@@ -27,15 +27,13 @@ using namespace std;
  * Example usage:
  *   vector<int> a = {3, 1, 4, 1, 5, 9, 2, 6};
  *   
- *   // Range Minimum Query
  *   auto minFunc = [](int x, int y) { return min(x, y); };
  *   SparseTable<int, decltype(minFunc)> st(a, minFunc);
- *   cout << st.query(2, 5) << endl; // Returns 1 (min of [4,1,5,9])
+ *   cout << st.query(2, 5) << endl;
  *   
- *   // Range Maximum Query
  *   auto maxFunc = [](int x, int y) { return max(x, y); };
  *   SparseTable<int, decltype(maxFunc)> st2(a, maxFunc);
- *   cout << st2.query(0, 3) << endl; // Returns 4 (max of [3,1,4,1])
+ *   cout << st2.query(0, 3) << endl;
  */
 
 template<typename T, typename F>
@@ -48,7 +46,6 @@ struct SparseTable {
     SparseTable(const vector<T>& a, F f) : n(a.size()), func(f) {
         if (n == 0) return;
         
-        // Precompute log values
         logTable.assign(n + 1, 0);
         for (int i = 2; i <= n; i++) {
             logTable[i] = logTable[i / 2] + 1;
@@ -57,13 +54,10 @@ struct SparseTable {
         int maxLog = logTable[n] + 1;
         table.assign(maxLog, vector<T>(n));
         
-        // Base case: intervals of length 1
         for (int i = 0; i < n; i++) {
             table[0][i] = a[i];
         }
         
-        // Build sparse table
-        // table[j][i] = result for interval [i, i + 2^j - 1]
         for (int j = 1; j < maxLog; j++) {
             for (int i = 0; i + (1 << j) <= n; i++) {
                 table[j][i] = func(table[j - 1][i], 
@@ -72,11 +66,9 @@ struct SparseTable {
         }
     }
     
-    // Query range [l, r] inclusive
     T query(int l, int r) {
         int len = r - l + 1;
         int k = logTable[len];
-        // Split range into two overlapping intervals of length 2^k
         return func(table[k][l], table[k][r - (1 << k) + 1]);
     }
 };
