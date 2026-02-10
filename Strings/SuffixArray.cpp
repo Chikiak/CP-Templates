@@ -1,284 +1,137 @@
-﻿#include <bits/stdc++.h>
-using namespace std;
-
-typedef vector<int> vi;
-
-/*
- * SUFFIX ARRAY - Lexicographically sorted array of all suffixes
+/**
+ * SUFFIX ARRAY + LCP + SPARSE TABLE
+ * ---------------------------------
+ * Algorithm:   Prefix Doubling (O(N log N)) + Kasai's Algorithm (O(N))
+ * Description: Builds SA and LCP array. Sentinel '$' is appended to the END.
+ *              Includes O(1) LCP queries via Sparse Table.
  * 
- * Initialization:
- *   SuffixArray(s) - Constructs suffix array from string s
+ * METHODS:
+ *   query(i, j)            : LCP of suffixes at i and j. O(1)
+ *   compare(i, l1, j, l2)  : Compare s[i..i+l1-1] vs s[j..j+l2-1]. Returns -1, 0, 1. O(1)
+ *   find(P)                : Find all starting indices of pattern P. O(|P| log N)
+ *   countDistinct()        : Count distinct substrings. O(N)
  * 
- * Member Variables:
- *   s      - Input string
- *   n      - Length of string
- *   sa     - Suffix array: sa[i] = starting position of i-th smallest suffix
- *   pos    - Inverse array: pos[i] = rank of suffix starting at position i
- *   lcp    - LCP array: lcp[i] = longest common prefix between sa[i] and sa[i-1]
- * 
- * Functions:
- *   getLCP(i, j)     - Returns LCP of suffixes starting at positions i and j
- *                      Time: O(1)
- *   
- *   compare(i1, l1, i2, l2) - Lexicographically compares two substrings:
- *                             s[i1...i1+l1-1] vs s[i2...i2+l2-1]
- *                             Returns: -1 if first < second, 0 if equal, 1 if first > second
- *                             Time: O(1)
- *   
- *   find(pattern)    - Finds all occurrences of pattern in string
- *                      Returns: vector of starting positions (sorted)
- *                      Time: O(|pattern| * log n)
- *   
- *   countDistinctSubstrings() - Counts total number of distinct substrings
- *                               Time: O(n)
- * 
- * Time Complexity:
- *   Construction: O(n log n) for suffix array + O(n) for LCP array
- *   Space: O(n log n)
- * 
- * Example usage:
- *   SuffixArray sa("banana");
- *   cout << sa.countDistinctSubstrings() << endl;
- *   vi matches = sa.find("ana");
- *   cout << sa.getLCP(1, 3) << endl;
+ * COMPLEXITY: Build O(N log N), Space O(N log N)
  */
 
-template<typename T, typename F>
+#include <bits/stdc++.h>
+using namespace std;
+
+template<typename T>
 struct SparseTable {
-    int n;
     vector<vector<T>> table;
-    vector<int> logTable;
-    F func;
-    
-    SparseTable() : n(0) {}
-    
-    SparseTable(const vector<T>& a, F f) : n(a.size()), func(f) {
+    int n;
+    SparseTable() {}
+    SparseTable(const vector<T>& a) : n(a.size()) {
         if (n == 0) return;
-        
-        logTable.assign(n + 1, 0);
-        for (int i = 2; i <= n; i++) {
-            logTable[i] = logTable[i / 2] + 1;
-        }
-        
-        int maxLog = logTable[n] + 1;
+        int maxLog = 32 - __builtin_clz(n);
         table.assign(maxLog, vector<T>(n));
-        
-        for (int i = 0; i < n; i++) {
-            table[0][i] = a[i];
-        }
-        
-        for (int j = 1; j < maxLog; j++) {
-            for (int i = 0; i + (1 << j) <= n; i++) {
-                table[j][i] = func(table[j - 1][i], 
-                                   table[j - 1][i + (1 << (j - 1))]);
-            }
-        }
+        for (int i = 0; i < n; i++) table[0][i] = a[i];
+        for (int j = 1; j < maxLog; j++)
+            for (int i = 0; i + (1 << j) <= n; i++)
+                table[j][i] = min(table[j - 1][i], table[j - 1][i + (1 << (j - 1))]);
     }
-    
     T query(int l, int r) {
-        int len = r - l + 1;
-        int k = logTable[len];
-        return func(table[k][l], table[k][r - (1 << k) + 1]);
+        int k = 31 - __builtin_clz(r - l + 1);
+        return min(table[k][l], table[k][r - (1 << k) + 1]);
     }
 };
 
 struct SuffixArray {
     string s;
     int n;
-    vi sa;
-    vi pos;
-    vi lcp;
-    SparseTable<int, function<int(int, int)>> lcpST;
-    
-    SuffixArray(const string& str) : s(str), n(str.size()) {
-        buildSuffixArray();
+    vector<int> sa, rk, lcp;
+    SparseTable<int> rmq;
+
+    SuffixArray(string _s) : s(_s + '$'), n(s.size()) {
+        buildSA();
         buildLCP();
-        
-        function<int(int, int)> minFunc = [](int a, int b) { return min(a, b); };
-        lcpST = SparseTable<int, function<int(int, int)>>(lcp, minFunc);
+        rmq = SparseTable<int>(lcp);
     }
-    
-    void buildSuffixArray() {
-        sa.resize(n);
-        pos.resize(n);
-        vi temp(n), cnt(max(256, n), 0), temp_sa(n);
-        
-        for (int i = 0; i < n; i++) {
-            sa[i] = i;
-            pos[i] = s[i];
+
+    void buildSA() {
+        sa.resize(n); rk.resize(n);
+        vector<int> cnt(max(256, n)), p(n), cn(n);
+        for (int i = 0; i < n; i++) cnt[s[i]]++;
+        for (int i = 1; i < 256; i++) cnt[i] += cnt[i - 1];
+        for (int i = n - 1; i >= 0; i--) sa[--cnt[s[i]]] = i;
+        rk[sa[0]] = 0;
+        int classes = 1;
+        for (int i = 1; i < n; i++) {
+            if (s[sa[i]] != s[sa[i - 1]]) classes++;
+            rk[sa[i]] = classes - 1;
         }
-        
-        for (int k = 1; k < n; k *= 2) {
+        for (int k = 0; (1 << k) < n; k++) {
             for (int i = 0; i < n; i++) {
-                cnt[i] = 0;
+                p[i] = sa[i] - (1 << k);
+                if (p[i] < 0) p[i] += n;
             }
-            
-            for (int i = 0; i < n; i++) {
-                int second = (i + k < n) ? pos[i + k] + 1 : 0;
-                cnt[second]++;
-            }
-            
-            for (int i = 1; i < max(256, n); i++) {
-                cnt[i] += cnt[i - 1];
-            }
-            
-            for (int i = n - 1; i >= 0; i--) {
-                int second = (sa[i] + k < n) ? pos[sa[i] + k] + 1 : 0;
-                temp_sa[--cnt[second]] = sa[i];
-            }
-            
-            for (int i = 0; i < max(256, n); i++) {
-                cnt[i] = 0;
-            }
-            
-            for (int i = 0; i < n; i++) {
-                cnt[pos[i]]++;
-            }
-            
-            for (int i = 1; i < max(256, n); i++) {
-                cnt[i] += cnt[i - 1];
-            }
-            
-            for (int i = n - 1; i >= 0; i--) {
-                sa[--cnt[pos[temp_sa[i]]]] = temp_sa[i];
-            }
-            
-            temp[sa[0]] = 0;
+            fill(cnt.begin(), cnt.begin() + classes, 0);
+            for (int i = 0; i < n; i++) cnt[rk[p[i]]]++;
+            for (int i = 1; i < classes; i++) cnt[i] += cnt[i - 1];
+            for (int i = n - 1; i >= 0; i--) sa[--cnt[rk[p[i]]]] = p[i];
+            cn[sa[0]] = 0;
+            classes = 1;
             for (int i = 1; i < n; i++) {
-                int prev_first = pos[sa[i - 1]];
-                int prev_second = (sa[i - 1] + k < n) ? pos[sa[i - 1] + k] : -1;
-                int cur_first = pos[sa[i]];
-                int cur_second = (sa[i] + k < n) ? pos[sa[i] + k] : -1;
-                
-                if (prev_first == cur_first && prev_second == cur_second) {
-                    temp[sa[i]] = temp[sa[i - 1]];
-                } else {
-                    temp[sa[i]] = temp[sa[i - 1]] + 1;
-                }
+                pair<int, int> cur = {rk[sa[i]], rk[(sa[i] + (1 << k)) % n]};
+                pair<int, int> prev = {rk[sa[i - 1]], rk[(sa[i - 1] + (1 << k)) % n]};
+                if (cur != prev) classes++;
+                cn[sa[i]] = classes - 1;
             }
-            pos = temp;
+            rk = cn;
+            if (classes == n) break;
         }
     }
-    
+
     void buildLCP() {
         lcp.assign(n, 0);
-        vi rank(n);
-        
+        int k = 0;
         for (int i = 0; i < n; i++) {
-            rank[sa[i]] = i;
-        }
-        
-        int h = 0;
-        for (int i = 0; i < n; i++) {
-            if (rank[i] > 0) {
-                int j = sa[rank[i] - 1];
-                while (i + h < n && j + h < n && s[i + h] == s[j + h]) {
-                    h++;
-                }
-                lcp[rank[i]] = h;
-                if (h > 0) h--;
-            }
+            if (rk[i] == 0) continue;
+            int j = sa[rk[i] - 1];
+            while (i + k < n && j + k < n && s[i + k] == s[j + k]) k++;
+            lcp[rk[i]] = k;
+            if (k > 0) k--;
         }
     }
-    
-    int getLCP(int i, int j) {
-        if (i == j) return n - i;
-        
-        int ri = pos[i];
-        int rj = pos[j];
-        
+
+    int query(int i, int j) {
+        if (i == j) return n - 1 - i;
+        int ri = rk[i], rj = rk[j];
         if (ri > rj) swap(ri, rj);
-        
-        if (ri + 1 > rj) return 0;
-        return lcpST.query(ri + 1, rj);
+        return rmq.query(ri + 1, rj);
     }
-    
-    int compare(int i1, int l1, int i2, int l2) {
-        if (i1 == i2 && l1 == l2) return 0;
-        
-        int commonLen = getLCP(i1, i2);
-        int minLen = min(l1, l2);
-        
-        if (commonLen >= minLen) {
-            if (l1 == l2) return 0;
-            return (l1 < l2) ? -1 : 1;
-        }
-        
-        int ri1 = pos[i1];
-        int ri2 = pos[i2];
-        
-        return (ri1 < ri2) ? -1 : 1;
+
+    int compare(int i, int len1, int j, int len2) {
+        int common = query(i, j);
+        int len = min(len1, len2);
+        if (common >= len) return (len1 == len2) ? 0 : (len1 < len2 ? -1 : 1);
+        return (s[i + common] < s[j + common]) ? -1 : 1;
     }
-    
-    vi find(const string& pattern) {
-        int m = pattern.size();
-        vi result;
-        
-        if (m == 0 || m > n) return result;
-        
-        auto cmp = [&](int pos, const string& pat) -> int {
-            int len = min(m, n - pos);
-            for (int i = 0; i < len; i++) {
-                if (s[pos + i] < pat[i]) return -1;
-                if (s[pos + i] > pat[i]) return 1;
-            }
-            if (len < m) return -1;
-            return 0;
-        };
-        
-        int left = 0, right = n - 1;
-        int leftBound = -1;
-        
-        while (left <= right) {
-            int mid = (left + right) / 2;
-            int comp = cmp(sa[mid], pattern);
-            
-            if (comp >= 0) {
-                if (comp == 0) {
-                    leftBound = mid;
-                }
-                right = mid - 1;
-            } else {
-                left = mid + 1;
-            }
+
+    vector<int> find(const string& pat) {
+        int m = pat.size();
+        int l = 0, r = n - 1, idx = -1;
+        while (l <= r) {
+            int mid = (l + r) / 2;
+            int res = s.compare(sa[mid], min(m, n - sa[mid]), pat);
+            if (res == 0) { idx = mid; r = mid - 1; }
+            else if (res < 0) l = mid + 1;
+            else r = mid - 1;
         }
-        
-        if (leftBound == -1) return result;
-        
-        left = 0;
-        right = n - 1;
-        int rightBound = -1;
-        
-        while (left <= right) {
-            int mid = (left + right) / 2;
-            int comp = cmp(sa[mid], pattern);
-            
-            if (comp == 0) {
-                rightBound = mid;
-                left = mid + 1;
-            } else if (comp > 0) {
-                right = mid - 1;
-            } else {
-                left = mid + 1;
-            }
+        vector<int> occ;
+        if (idx != -1) {
+            while (idx < n && s.compare(sa[idx], min(m, n - sa[idx]), pat) == 0)
+                occ.push_back(sa[idx++]);
         }
-        
-        for (int i = leftBound; i <= rightBound; i++) {
-            result.push_back(sa[i]);
-        }
-        
-        sort(result.begin(), result.end());
-        return result;
+        sort(occ.begin(), occ.end());
+        return occ;
     }
-    
+
     long long countDistinctSubstrings() {
-        long long total = (long long)n * (n + 1) / 2;
-        long long duplicates = 0;
-        
-        for (int i = 0; i < n; i++) {
-            duplicates += lcp[i];
-        }
-        
-        return total - duplicates;
+        long long total = 0;
+        for (int i = 1; i < n; i++) 
+            total += (n - 1 - sa[i]) - lcp[i];
+        return total;
     }
 };
