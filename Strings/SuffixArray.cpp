@@ -206,7 +206,7 @@ struct SuffixArray {
         int m = pattern.size();
         vi result;
         
-        if (m > n) return result;
+        if (m == 0 || m > n) return result;
         
         // Binary search for the leftmost position
         int left = 0, right = n - 1;
